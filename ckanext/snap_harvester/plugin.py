@@ -1,25 +1,17 @@
-import ckan.plugins as p
-from ckanext.spatial.interfaces import ISpatialHarvester
-
-import re
-import urllib
-import urlparse
-
 import logging
+log = logging.getLogger(__name__)
 
-from ckan import model
+from lxml import etree
+import json
 
 from ckan.plugins.core import SingletonPlugin, implements
 
 from ckanext.harvest.interfaces import IHarvester
-from ckanext.harvest.model import HarvestObject
-from ckanext.harvest.model import HarvestObjectExtra as HOExtra
 
-from ckanext.spatial.lib.csw_client import CswService
-from ckanext.spatial.harvesters.base import SpatialHarvester, text_traceback
+from ckanext.spatial.harvesters.csw import CSWHarvester, text_traceback
+from pprint import pprint
 
-
-class SnapHarvester(SpatialHarvester, SingletonPlugin):
+class SnapHarvester(CSWHarvester, SingletonPlugin):
 
     implements(IHarvester)
 
@@ -28,21 +20,36 @@ class SnapHarvester(SpatialHarvester, SingletonPlugin):
             'name': 'SNAP',
             'title': 'SNAP GeoNetwork instance',
             'description': 'Imports from GeoNetwork via CSW, pulling in more fields than default'
-            }
+        }
 
-    def get_package_dict(self, context, data_dict):
+    def get_package_dict(self, iso_values, harvest_object):
 
-        # Check the reference below to see all that's included on data_dict
+        namespaces = {
+            "gts": "http://www.isotc211.org/2005/gts",
+            "gml": "http://www.opengis.net/gml/3.2",
+            "gmx": "http://www.isotc211.org/2005/gmx",
+            "gsr": "http://www.isotc211.org/2005/gsr",
+            "gss": "http://www.isotc211.org/2005/gss",
+            "gco": "http://www.isotc211.org/2005/gco",
+            "gmd": "http://www.isotc211.org/2005/gmd",
+            "srv": "http://www.isotc211.org/2005/srv",
+            "xlink": "http://www.w3.org/1999/xlink",
+            "xsi": "http://www.w3.org/2001/XMLSchema-instance",
+        }
 
-        package_dict = data_dict['package_dict']
-        iso_values = data_dict['iso_values']
+        package_dict = super(SnapHarvester, self).get_package_dict(iso_values, harvest_object)
+
+        tree = etree.fromstring(harvest_object.content)
+        credits = tree.xpath('//gmd:credit/gco:CharacterString/text()', namespaces=namespaces)
 
         package_dict['extras'].append(
-            {'key': 'topic-category', 'value': iso_values.get('topic-category')}
+            {'key': 'credits', 'value': json.dumps(credits)}
         )
-
         package_dict['extras'].append(
-            {'key': 'my-custom-extra', 'value': 'my-custom-value'}
+            {'key': 'temporal-extent-begin', 'value': iso_values.get('temporal-extent-begin')}
+        )
+        package_dict['extras'].append(
+            {'key': 'temporal-extent-end', 'value': iso_values.get('temporal-extent-end')}
         )
 
         return package_dict
