@@ -9,7 +9,12 @@ from ckan.plugins.core import SingletonPlugin, implements
 from ckanext.harvest.interfaces import IHarvester
 
 from ckanext.spatial.harvesters.csw import CSWHarvester, text_traceback
+
+import logging
+
 from pprint import pprint
+
+log = logging.getLogger(__name__)
 
 class SnapHarvester(CSWHarvester, SingletonPlugin):
 
@@ -47,6 +52,20 @@ class SnapHarvester(CSWHarvester, SingletonPlugin):
         # Will get two values, one for x and one for y; we can assume square pixels for the moment.
         spatial_resolution = tree.xpath('//gmd:spatialRepresentationInfo/gmd:MD_Georectified/gmd:axisDimensionProperties/gmd:MD_Dimension/gmd:resolution/gco:Angle/text()', namespaces=namespaces)[0]
         spatial_resolution_units = tree.xpath('//gmd:spatialRepresentationInfo/gmd:MD_Georectified/gmd:axisDimensionProperties/gmd:MD_Dimension/gmd:resolution/gco:Angle/@uom', namespaces=namespaces)[0]
+
+        # Rebuild the list of dicts to remove the license item, which seems to not ingest properly.
+        extras = package_dict['extras']
+        package_dict['extras'] = []
+        for item in extras:
+            if item['key'] != 'licence':
+                package_dict['extras'].append(item)
+        
+        # Attach our CC license
+        package_dict['license_title'] = 'Creative Commons Attribution'
+        package_dict['license_id'] = 'CC-BY-NC-SA-3.0' # corresponds to licenses.json file
+        package_dict['license_url'] = 'http://www.opendefinition.org/licenses/cc-by'
+        package_dict['extras'].append({'key':'license', 'value':'Attribution-NonCommercial-ShareAlike 3.0 Unported'})
+        package_dict['extras'].append({'key':'license_url', 'value':'http://creativecommons.org/licenses/by-nc-sa/3.0/'})
 
         package_dict['extras'].append(
             {'key': 'credits', 'value': json.dumps(credits)}
