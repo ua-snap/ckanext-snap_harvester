@@ -52,11 +52,18 @@ class SnapHarvester(CSWHarvester, SingletonPlugin):
             extras[extra['key']] = extra['value']
 
         # Version of data set: called Edition in GN
-        package_dict['version'] = tree.xpath('//gmd:edition/gco:CharacterString/text()', namespaces=namespaces)
+        version = tree.xpath('//gmd:edition/gco:CharacterString/text()', namespaces=namespaces)
+        if version:
+            package_dict['version'] = version[0]
 
         # Maintainer name/email
-        package_dict['maintainer'] = tree.xpath('//gmd:pointOfContact/gmd:CI_ResponsibleParty/gmd:individualName/gco:CharacterString/text()', namespaces=namespaces)
-        package_dict['maintainer_email'] = tree.xpath('//gmd:pointOfContact/gmd:CI_ResponsibleParty/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress/gco:CharacterString/text()', namespaces=namespaces)
+        maintainer = tree.xpath('//gmd:pointOfContact/gmd:CI_ResponsibleParty/gmd:individualName/gco:CharacterString/text()', namespaces=namespaces)
+        if maintainer:
+            package_dict['maintainer'] = maintainer[0]
+
+        maintainer_email = tree.xpath('//gmd:pointOfContact/gmd:CI_ResponsibleParty/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress/gco:CharacterString/text()', namespaces=namespaces)[0]
+        if maintainer_email:
+            package_dict['maintainer_email'] = maintainer_email
 
         # Credits: Will be a list of names.
         credits = tree.xpath('//gmd:credit/gco:CharacterString/text()', namespaces=namespaces)
