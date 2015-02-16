@@ -43,7 +43,7 @@ class SnapHarvester(CSWHarvester, SingletonPlugin):
         }
 
         package_dict = super(SnapHarvester, self).get_package_dict(iso_values, harvest_object)
-
+        
         tree = etree.fromstring(harvest_object.content)
 
         # Convert package extras to a dictionary to ease manipulation
@@ -83,6 +83,15 @@ class SnapHarvester(CSWHarvester, SingletonPlugin):
             extras['temporal-extent-begin'] = temporal_extent_begin[0]
             extras['temporal-extent-end'] = temporal_extent_end = temporal_extent_end[0]
 
+        # Manage incoming attached resources.
+        # To work around a bug that won't be released until CKAN2.3, we will attach the URL of the data bucket to the package extras so we can search
+        # it via the API.
+        for resource in package_dict['resources']:
+            if resource['name'].lower() == 'access data':
+                log.debug('** Attaching resource URL: {0}'.format(resource['url']))
+                package_dict['url'] = resource['url']
+                extras['download-url'] = resource['url']
+
         # Rebuild the package extras as a list
         package_dict['extras'] = []
         for key, value in extras.iteritems():
@@ -94,6 +103,5 @@ class SnapHarvester(CSWHarvester, SingletonPlugin):
         package_dict['license_url'] = 'http://www.opendefinition.org/licenses/cc-by'
         package_dict['extras'].append({'key':'license', 'value':'Attribution-NonCommercial-ShareAlike 3.0 Unported'})
         package_dict['extras'].append({'key':'license_url', 'value':'http://creativecommons.org/licenses/by-nc-sa/3.0/'})
-        pprint(package_dict)
 
         return package_dict
