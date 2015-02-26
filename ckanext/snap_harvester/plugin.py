@@ -84,13 +84,16 @@ class SnapHarvester(CSWHarvester, SingletonPlugin):
             extras['temporal-extent-end'] = temporal_extent_end = temporal_extent_end[0]
 
         # Manage incoming attached resources.
-        # To work around a bug that won't be released until CKAN2.3, we will attach the URL of the data bucket to the package extras so we can search
+        # To work around a bug that won't be fixed until CKAN2.3, we will attach the URL of the data bucket to the package extras so we can search
         # it via the API.
         for resource in package_dict['resources']:
             if resource['name'].lower() == 'access data':
-                log.debug('** Attaching resource URL: {0}'.format(resource['url']))
                 package_dict['url'] = resource['url']
                 extras['download-url'] = resource['url']
+                resource['format'] = 'HTML'
+            elif resource['name'].lower() == 'xml metadata':
+                pprint(resource)
+                resource['format'] = 'XML'
 
         # Rebuild the package extras as a list
         package_dict['extras'] = []
