@@ -76,8 +76,8 @@ class SnapHarvester(CSWHarvester, SingletonPlugin):
         extras['spatial-resolution-units'] = spatial_resolution_units
 
         # Temporal extent: The way we fetch temporal-start and temporal-end can be different from what the built-in xpath uses.
-        temporal_extent_begin = tree.xpath('//gml:TimePeriod/gml:begin//gml:timePosition/text()', namespaces=namespaces)
-        temporal_extent_end = tree.xpath('//gml:TimePeriod/gml:end//gml:timePosition/text()', namespaces=namespaces)
+        temporal_extent_begin = tree.xpath('//gml:TimePeriod/gml:beginPosition/text()', namespaces=namespaces)
+        temporal_extent_end = tree.xpath('//gml:TimePeriod/gml:endPosition/text()', namespaces=namespaces)
         log.debug('Got temporal extents, begin {0} end {1}'.format(temporal_extent_begin, temporal_extent_end))
         if(temporal_extent_begin and temporal_extent_end):
             extras['temporal-extent-begin'] = temporal_extent_begin[0]
