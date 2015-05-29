@@ -43,7 +43,7 @@ class SnapHarvester(CSWHarvester, SingletonPlugin):
         }
 
         package_dict = super(SnapHarvester, self).get_package_dict(iso_values, harvest_object)
-        
+
         tree = etree.fromstring(harvest_object.content)
 
         # Convert package extras to a dictionary to ease manipulation
@@ -70,10 +70,13 @@ class SnapHarvester(CSWHarvester, SingletonPlugin):
         extras['credits'] = json.dumps(credits)
 
         # Spatial resolution: Will get two values, one for x and one for y; we can assume square pixels for the moment.
-        spatial_resolution = tree.xpath('//gmd:spatialRepresentationInfo/gmd:MD_Georectified/gmd:axisDimensionProperties/gmd:MD_Dimension/gmd:resolution/gco:Angle/text()', namespaces=namespaces)[0]
-        spatial_resolution_units = tree.xpath('//gmd:spatialRepresentationInfo/gmd:MD_Georectified/gmd:axisDimensionProperties/gmd:MD_Dimension/gmd:resolution/gco:Angle/@uom', namespaces=namespaces)[0]
-        extras['spatial-resolution'] = spatial_resolution
-        extras['spatial-resolution-units'] = spatial_resolution_units
+        spatial_resolution = tree.xpath('//gmd:spatialRepresentationInfo/gmd:MD_Georectified/gmd:axisDimensionProperties/gmd:MD_Dimension/gmd:resolution/gco:Angle/text()', namespaces=namespaces)
+        if spatial_resolution:
+            extras['spatial-resolution'] = spatial_resolution[0]
+
+        spatial_resolution_units = tree.xpath('//gmd:spatialRepresentationInfo/gmd:MD_Georectified/gmd:axisDimensionProperties/gmd:MD_Dimension/gmd:resolution/gco:Angle/@uom', namespaces=namespaces)
+        if spatial_resolution_units:
+            extras['spatial-resolution-units'] = spatial_resolution_units[0]
 
         # Temporal extent: The way we fetch temporal-start and temporal-end can be different from what the built-in xpath uses.
         temporal_extent_begin = tree.xpath('//gml:TimePeriod/gml:beginPosition/text()', namespaces=namespaces)
