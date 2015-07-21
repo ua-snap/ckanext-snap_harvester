@@ -97,6 +97,8 @@ class SnapHarvester(CSWHarvester, SingletonPlugin):
             elif resource['name'].lower() == 'xml metadata':
                 pprint(resource)
                 resource['format'] = 'XML'
+            elif resource['url']:
+                resource['format'] = 'HTML'
 
         # Rebuild the package extras as a list
         package_dict['extras'] = []
