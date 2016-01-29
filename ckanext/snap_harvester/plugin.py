@@ -106,10 +106,10 @@ class SnapHarvester(CSWHarvester, SingletonPlugin):
             package_dict['extras'].append({'key': key, 'value': value})
         
         # Attach our CC license directly to package
-        package_dict['license_title'] = 'Creative Commons Attribution'
-        package_dict['license_id'] = 'CC-BY-NC-SA-3.0' # corresponds to licenses.json file
-        package_dict['license_url'] = 'http://www.opendefinition.org/licenses/cc-by'
-        package_dict['extras'].append({'key':'license', 'value':'Attribution-NonCommercial-ShareAlike 3.0 Unported'})
-        package_dict['extras'].append({'key':'license_url', 'value':'http://creativecommons.org/licenses/by-nc-sa/3.0/'})
+        package_dict['license_title'] = 'Creative Commons Attribution-NoDerivatives 4.0 International'
+        package_dict['license_id'] = 'CC BY-ND 4.0' # corresponds to licenses.json file
+        package_dict['license_url'] = 'https://creativecommons.org/licenses/by-nd/4.0/'
+        package_dict['extras'].append({'key':'license', 'value':'Creative Commons Attribution-NoDerivatives 4.0 International'})
+        package_dict['extras'].append({'key':'license_url', 'value':'https://creativecommons.org/licenses/by-nd/4.0/'})
 
         return package_dict
