@@ -20,14 +20,14 @@
 "domain_data": true,
 "domain_software": false,
 "family": "Creative Commons",
-"id": "CC BY-ND 4.0",
+"id": "CC BY 4.0",
 "maintainer": "Creative Commons",
 "od_conformance": "rejected",
 "osd_conformance": "not reviewed",
 "status": "active",
 "is_okd_compliant": false,
 "is_osi_compliant": false,
-"title": "Creative Commons Attribution-NoDerivatives 4.0 International",
-"url": "https://creativecommons.org/licenses/by-nd/4.0/"
+"title": "Creative Commons Attribution 4.0 International",
+"url": "http://creativecommons.org/licenses/by/4.0/"
 }
 ]
